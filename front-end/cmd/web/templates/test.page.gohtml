@@ -9,6 +9,7 @@
 
                 <a id="brokerBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Test Broker</a>
                 <a id="authBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Test Auth</a>
+                <a id="loggerBtn" class="btn btn-outline-secondary" href="javascript:void(0);">Test Logger</a>
 
                 <div id="output" class="mt-5" style="outline: 1px solid silver; padding: 2em;">
                     <span class="text-muted">Output shows here...</span>
@@ -36,9 +37,44 @@
     <script>
         let brokerBtn = document.getElementById("brokerBtn")
         let authBtn = document.getElementById("authBtn")
+        let loggerBtn = document.getElementById("loggerBtn")
         let output = document.getElementById("output")
         let sent = document.getElementById("sent")
         let received = document.getElementById("received")
+
+        loggerBtn.addEventListener("click", function() {
+            const payload = {
+                action: "logger",
+                logger: {
+                    name: "event",
+                    data: "okeay"
+                }
+            }
+
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+
+            const body = {
+                method: "POST",
+                body: json.stringify(payload),
+                headers: headers
+            }
+
+            fetch("http:\/\/localhost:8000/handle", body)
+            .then((response) => response.json())
+            .then((data) => {
+                sent.innerHTML = JSON.stringify(payload, undefined, 4);
+                received.innerHTML = JSON.stringify(data, undefined, 4);
+                if (data.error) {
+                    output.innerHTML += `<br><strong>Error</strong>: ${data.message}`;
+                } else {
+                    output.innerHTML += `<br><strong>Response from broker service</strong>: ${data.message}`;
+                }
+            })
+            .catch((error) => {
+                output.innerHTML += "<br><br>Eror: " + error;
+            })
+        })
 
         authBtn.addEventListener("click", function() {
             const payload = {
