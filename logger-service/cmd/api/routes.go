@@ -23,7 +23,7 @@ func (c *Config) routes() http.Handler {
 
 	mux.Use(middleware.Heartbeat("/ping"))
 
-	mux.Post("/", c.WriteLog)
+	mux.Post("/log", c.WriteLog)
 
 	return mux
 }

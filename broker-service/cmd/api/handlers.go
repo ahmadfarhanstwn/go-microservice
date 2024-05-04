@@ -8,13 +8,19 @@ import (
 )
 
 type RequestPayload struct {
-	Action      string      `json:"action"`
-	AuthPayload AuthPayload `json:"auth,omitempty"`
+	Action        string        `json:"action"`
+	AuthPayload   AuthPayload   `json:"auth,omitempty"`
+	LoggerPayload LoggerPayload `json:"logger,omitempty"`
 }
 
 type AuthPayload struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type LoggerPayload struct {
+	Name string `json:"name"`
+	Data string `json:"data"`
 }
 
 func (c *Config) Broker(w http.ResponseWriter, r *http.Request) {
@@ -38,6 +44,8 @@ func (c *Config) HandleSubmission(w http.ResponseWriter, r *http.Request) {
 	switch requestPayload.Action {
 	case "auth":
 		c.authenticate(w, requestPayload.AuthPayload)
+	case "logger":
+		c.sendLog(w, requestPayload.LoggerPayload)
 	default:
 		c.errorJson(w, errors.New("unknown actions"))
 	}
@@ -83,4 +91,33 @@ func (c *Config) authenticate(w http.ResponseWriter, a AuthPayload) {
 	}
 
 	c.writeJSON(w, http.StatusAccepted, jsonFromService.Data)
+}
+
+func (c *Config) sendLog(w http.ResponseWriter, l LoggerPayload) {
+	jsonData, _ := json.MarshalIndent(l, "", "\t")
+
+	// call the service
+	request, err := http.NewRequest("POST", "http://logger-service/log", bytes.NewBuffer(jsonData))
+	if err != nil {
+		c.errorJson(w, err)
+		return
+	}
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		c.errorJson(w, err)
+		return
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusAccepted {
+		c.errorJson(w, err)
+		return
+	}
+
+	var payload jsonResponse
+	payload.Error = false
+	payload.Message = "logged"
+	c.writeJSON(w, http.StatusAccepted, payload)
 }
