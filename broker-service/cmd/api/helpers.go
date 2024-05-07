@@ -62,7 +62,7 @@ func (c *Config) errorJson(w http.ResponseWriter, err error, status ...int) erro
 
 	var payload jsonResponse
 	payload.Error = true
-	payload.Message = err.Error()
+	payload.Message = "error"
 
 	return c.writeJSON(w, statusCode, payload)
 }

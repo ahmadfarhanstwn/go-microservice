@@ -43,6 +43,7 @@
         let received = document.getElementById("received")
 
         loggerBtn.addEventListener("click", function() {
+            console.log('clicked')
             const payload = {
                 action: "logger",
                 logger: {
@@ -56,7 +57,7 @@
 
             const body = {
                 method: "POST",
-                body: json.stringify(payload),
+                body: JSON.stringify(payload),
                 headers: headers
             }
 
@@ -90,7 +91,7 @@
 
             const body = {
                 method: "POST",
-                body: json.stringify(payload),
+                body: JSON.stringify(payload),
                 headers: headers
             }
 
