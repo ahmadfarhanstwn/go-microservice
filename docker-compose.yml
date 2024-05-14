@@ -34,6 +34,17 @@ services:
       mode: replicated
       replicas: 1
 
+  mailer-service:
+    build:
+      context: ./mailer-service
+      dockerfile: ./mailer-service.dockerfile
+    restart: always
+    ports:
+      - "8002:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+
   postgres:
     image: 'postgres:14.2'
     ports:
