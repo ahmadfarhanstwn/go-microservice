@@ -1,6 +1,9 @@
 package main
 
-import "net/http"
+import (
+	"log"
+	"net/http"
+)
 
 type mailMessage struct {
 	From    string `json:"from"`
@@ -14,6 +17,7 @@ func (c *Config) SendMail(w http.ResponseWriter, r *http.Request) {
 
 	err := c.readJSON(w, r, &requestPayload)
 	if err != nil {
+		log.Print(err)
 		c.errorJson(w, err)
 		return
 	}
@@ -27,6 +31,7 @@ func (c *Config) SendMail(w http.ResponseWriter, r *http.Request) {
 
 	err = c.Mailer.SendSMTPMessage(msg)
 	if err != nil {
+		log.Print(err)
 		c.errorJson(w, err)
 		return
 	}
